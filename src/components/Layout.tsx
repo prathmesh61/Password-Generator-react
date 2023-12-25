@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const Layout = () => {
   const [password, setPassword] = useState("");
   const [length, setLength] = useState<number>(8);
   const [checkNumber, setCheckNumber] = useState<boolean>(false);
 
+  const copyRef = useRef<HTMLInputElement | null>(null);
   const handleCreatepassword = useCallback(() => {
     let pass = "";
     let str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -16,6 +17,12 @@ const Layout = () => {
     setPassword(pass);
   }, [setPassword, length, checkNumber]);
 
+  const copyPasswordFn = useCallback(() => {
+    copyRef.current?.select();
+    copyRef.current?.setSelectionRange(0, 99);
+    window.navigator.clipboard.writeText(password);
+  }, [password]);
+
   useEffect(() => {
     handleCreatepassword();
   }, [checkNumber, length]);
@@ -25,12 +32,16 @@ const Layout = () => {
       <div className="flex items-center ">
         <input
           type="text"
-          className="bg-transparent border border-black rounded-l-md w-full"
+          className="bg-transparent border border-black rounded-l-md w-full py-1 "
+          ref={copyRef}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <button className="bg-blue-500 text-white px-3 py-1 rounded-r-md text-sm">
-          Generate
+        <button
+          className="bg-blue-500 text-white px-3 py-2 rounded-r-md text-sm"
+          onClick={copyPasswordFn}
+        >
+          Copy
         </button>
       </div>
       <div className="flex items-center gap-2 mt-5">
@@ -40,7 +51,7 @@ const Layout = () => {
           min={8}
           max={100}
           value={length}
-          onChange={(e) => setLength(e.target.value)}
+          onChange={(e) => setLength(+e.target.value)}
         />
         <label>Numbers: </label>
         <input
