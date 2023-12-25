@@ -1,11 +1,24 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-type Props = {};
-
-const Layout = (props: Props) => {
+const Layout = () => {
   const [password, setPassword] = useState("");
-  const [length, setLength] = useState<String | null>("");
-  const [checkNumber, setCheckNumber] = useState<Boolean>(false);
+  const [length, setLength] = useState<number>(8);
+  const [checkNumber, setCheckNumber] = useState<boolean>(false);
+
+  const handleCreatepassword = useCallback(() => {
+    let pass = "";
+    let str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    if (checkNumber) str += "1234567890";
+    for (let i = 0; i <= length; i++) {
+      let generatePass = Math.floor(Math.random() * str.length + 1);
+      pass += str.charAt(generatePass);
+    }
+    setPassword(pass);
+  }, [setPassword, length, checkNumber]);
+
+  useEffect(() => {
+    handleCreatepassword();
+  }, [checkNumber, length]);
 
   return (
     <div className="flex flex-col items-center justify-center">
@@ -21,10 +34,20 @@ const Layout = (props: Props) => {
         </button>
       </div>
       <div className="flex items-center gap-2 mt-5">
-        <label>Length: </label>
-        <input type="range" onChange={(e) => setLength(e.target?.value)} />
+        <label>Length: {length}</label>
+        <input
+          type="range"
+          min={8}
+          max={100}
+          value={length}
+          onChange={(e) => setLength(e.target.value)}
+        />
         <label>Numbers: </label>
-        <input type="checkbox" onChange={(prev) => setCheckNumber(!prev)} />
+        <input
+          type="checkbox"
+          defaultChecked={checkNumber}
+          onChange={() => setCheckNumber((prev) => !prev)}
+        />
       </div>
     </div>
   );
